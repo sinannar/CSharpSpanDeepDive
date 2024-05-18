@@ -3,19 +3,25 @@
 int[] three = [42, 43, 44];
 
 // C# compiler generate UTF8 bytes from this string and blitting those directly to assembly and span just pointing to that data in binary
-ReadOnlySpan<byte> span = "Hello, Sinan"u8; 
+ReadOnlySpan<byte> span = "Hello, Sinan"u8;
 
 
-static string Create(Action<char[]> action)
+string.Create(34, Guid.NewGuid(), (span, guid) =>
 {
-
-}
-
-Create(array => { 
-    array[0] = 'H';
-    s_array = array;
+    "ID".AsSpan().CopyTo(span);
+    guid.TryFormat(span.Slice(2), out _, "N");
 });
-char[] s_array;
+
+//static string Create(Action<char[]> action)
+//{
+
+//}
+
+//Create(array => { 
+//    array[0] = 'H';
+//    s_array = array;
+//});
+//char[] s_array;
 
 
 Sum(array);
