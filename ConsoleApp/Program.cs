@@ -1,24 +1,20 @@
-﻿var list = Enumerable.Range(0, 1000).ToList();
+﻿int[] array = new int[1000];
 
-while (true)
-{
-    Sum(list, 0 , 50);
-}
-
+// unsafe is disabling JIT bound check
 unsafe
-{ 
-    int* pointer = stackalloc int[1000];
-    int length = 1000;
-    Sum(pointer, 0, length);
+{
+    fixed (int* ptr = array)
+    {
+
+    }
 }
 
-static int Sum(IList<int> array, int offset, int length)
+static unsafe int Sum(int* pointer, int length)
 {
     int sum = 0;
-    for (int i = offset; i < offset + length; i++)
+    for (int i = 0; i < length; i++)
     {
-        sum += array[i];
+        sum += pointer[i];
     }
     return sum;
 }
-
