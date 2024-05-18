@@ -48,7 +48,8 @@ Console.WriteLine(i);
 Use(ref i);
 Console.WriteLine(i);
 
-static void Use(ref int i)
+static ref int  Use(ref int i)
 {
-    i = 42;
+    ref int j = ref i;
+    return ref i;
 }
