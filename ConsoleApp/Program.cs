@@ -2,15 +2,16 @@
 
 while (true)
 {
-    int[] copy = new int[50];
-    Array.Copy(array, 0, copy, 0, 50);
-    Sum(copy);
+    Sum(array, 0 , 50);
 }
 
 
-static int Sum(int[] array)
+static int Sum(int[] array, int offset, int length)
 {
     int sum = 0;
-    foreach (var i in array) sum += i;
+    for (int i = offset; i < offset + length; i++)
+    {
+        sum += array[i];
+    }
     return sum;
 }
