@@ -1,11 +1,9 @@
 ﻿int[] array = new int[1000];
 
 int[] three = [42, 43, 44];
-Span<int> span = [42, 43, 44];
-ReadOnlySpan<int> readonlyspan = [42, 43, 44];
-three[0] = 45;
-span[0] = 45;
-//readonlyspan[0] = 45; // compile error
+
+// C# compiler generate UTF8 bytes from this string and blitting those directly to assembly and span just pointing to that data in binary
+ReadOnlySpan<byte> span = "Hello, Sinan"u8; 
 
 Sum(array);
 Sum(new Span<int>(array, 0, 50));
