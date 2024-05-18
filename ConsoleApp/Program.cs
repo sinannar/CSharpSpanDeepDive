@@ -42,21 +42,93 @@
 
 
 
-int i = 0;
+//int i = 0;
 
-unsafe
+//unsafe
+//{
+//    int* ptr = &i;
+//    ref int iref = ref *ptr;
+
+//    // we have managerd reference for pointer value
+//    // we can use USE function that we defined below with that managed refernce as iref
+//    // if we have that reference and length as tuple, that is Span itself actually
+//    // put this ref and legnth as tuple and pass around, so ref should be able to use as a field
+
+//}
+
+//static void Use(ref int reference, int length)
+//{
+
+//}
+
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
+int i = 42;
+Console.WriteLine(i);
+var span = new MySpan<int>(ref i, 1000);
+span[0] = 43;
+Console.WriteLine(i);
+
+readonly ref struct MySpan<T>
 {
-    int* ptr = &i;
-    ref int iref = ref *ptr;
+    private readonly ref T _reference; // ref field can only be declared in a ref struct
+    private readonly int _lenght;
 
-    // we have managerd reference for pointer value
-    // we can use USE function that we defined below with that managed refernce as iref
-    // if we have that reference and length as tuple, that is Span itself actually
-    // put this ref and legnth as tuple and pass around, so ref should be able to use as a field
+    public MySpan(ref T reference)
+    {
+        _reference = ref reference;
+        _lenght = 1;
+    }
 
+    public MySpan(T[] array)
+    {
+        ArgumentNullException.ThrowIfNull(array, nameof(array));
+        //_reference = ref array[0];
+        _reference = ref MemoryMarshal.GetArrayDataReference(array);
+        _lenght = array.Length;
+    }
+
+    // This does not exist on Span, it exist on MemoryMarshal.CreateSpan
+    public MySpan(ref T reference, int lenght) // MemoryMarshal.CreateSpan
+    {
+        _reference = ref reference;
+        _lenght = lenght;
+    }
+
+    public ref T this[int index]
+    {
+        get
+        {
+            if ((uint)index >= (uint)_lenght)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            return ref Unsafe.Add(ref _reference, index); // using ref here remove the necessity of writing Setter for this piece
+        }
+    }
+
+    //public T this[int index]
+    //{
+    //    get
+    //    {
+    //        if ((uint)index >= (uint)_lenght)
+    //        {
+    //            throw new IndexOutOfRangeException();
+    //        }
+    //        return Unsafe.Add(ref _reference, index); 
+    //    }
+
+    //    set
+    //    {
+    //        if ((uint)index >= (uint)_lenght)
+    //        {
+    //            throw new IndexOutOfRangeException();
+    //        }
+    //        Unsafe.Add(ref _reference, index) = value;
+    //    }
+    //}
 }
 
-static void Use(ref int reference, int length)
-{
 
-}
+
