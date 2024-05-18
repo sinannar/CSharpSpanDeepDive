@@ -44,12 +44,19 @@
 
 int i = 0;
 
-Console.WriteLine(i);
-Use(ref i);
-Console.WriteLine(i);
-
-static ref int  Use(ref int i)
+unsafe
 {
-    ref int j = ref i;
-    return ref i;
+    int* ptr = &i;
+    ref int iref = ref *ptr;
+
+    // we have managerd reference for pointer value
+    // we can use USE function that we defined below with that managed refernce as iref
+    // if we have that reference and length as tuple, that is Span itself actually
+    // put this ref and legnth as tuple and pass around, so ref should be able to use as a field
+
+}
+
+static void Use(ref int reference, int length)
+{
+
 }
