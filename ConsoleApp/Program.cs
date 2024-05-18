@@ -1,20 +1,17 @@
 ﻿int[] array = new int[1000];
 
-// unsafe is disabling JIT bound check
+Sum(array);
+Sum(new Span<int>(array, 0, 50));
+
 unsafe
 {
-    fixed (int* ptr = array)
-    {
-
-    }
+    int* ptr = stackalloc int[1000];
+    Sum(new Span<int>(ptr, 1000));
 }
 
-static unsafe int Sum(int* pointer, int length)
+static unsafe int Sum(Span<int> span)
 {
     int sum = 0;
-    for (int i = 0; i < length; i++)
-    {
-        sum += pointer[i];
-    }
+    foreach (int value in span) sum += value;
     return sum;
 }
