@@ -150,5 +150,54 @@ readonly ref struct MySpan<T>
     }
 }
 
+readonly ref struct MyReadOnlySpan<T>
+{
+    private readonly ref T _reference; // ref field can only be declared in a ref struct
+    private readonly int _lenght;
+
+    public int Length => _lenght;
+
+    public MyReadOnlySpan(ref T reference)
+    {
+        _reference = ref reference;
+        _lenght = 1;
+    }
+
+    public MyReadOnlySpan(T[] array)
+    {
+        ArgumentNullException.ThrowIfNull(array, nameof(array));
+        //_reference = ref array[0];
+        _reference = ref MemoryMarshal.GetArrayDataReference(array);
+        _lenght = array.Length;
+    }
+
+    // This does not exist on Span, it exist on MemoryMarshal.CreateSpan
+    public MyReadOnlySpan(ref T reference, int lenght) // MemoryMarshal.CreateSpan
+    {
+        _reference = ref reference;
+        _lenght = lenght;
+    }
+
+    public ref readonly T this[int index]
+    {
+        get
+        {
+            if ((uint)index >= (uint)_lenght)
+            {
+                throw new IndexOutOfRangeException();
+            }
+            return ref Unsafe.Add(ref _reference, index); // using ref here remove the necessity of writing Setter for this piece
+        }
+    }
+
+    public MySpan<T> Slice(int offset)
+    {
+        if ((uint)offset > (uint)_lenght)
+        {
+            throw new IndexOutOfRangeException();
+        }
+        return new MySpan<T>(ref Unsafe.Add(ref _reference, offset), _lenght - offset);
+    }
+}
 
 
