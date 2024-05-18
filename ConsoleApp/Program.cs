@@ -61,19 +61,30 @@
 
 //}
 
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-int i = 42;
-Console.WriteLine(i);
-var span = new MySpan<int>(ref i, 1000);
-span[0] = 43;
-Console.WriteLine(i);
+//int i = 42;
+//Console.WriteLine(i);
+//var span = new MySpan<int>(ref i, 1000);
+//span[0] = 43;
+//Console.WriteLine(i);
+
+MySpan<char> span = new MySpan<char>("Hello, World!".ToCharArray());
+while(span.Length > 0)
+{
+    Console.WriteLine(span[0]);
+    span = span.Slice(1);
+}
+
 
 readonly ref struct MySpan<T>
 {
     private readonly ref T _reference; // ref field can only be declared in a ref struct
     private readonly int _lenght;
+    
+    public int Length => _lenght;
 
     public MySpan(ref T reference)
     {
@@ -128,6 +139,15 @@ readonly ref struct MySpan<T>
     //        Unsafe.Add(ref _reference, index) = value;
     //    }
     //}
+
+    public MySpan<T> Slice(int offset)
+    {
+        if ((uint)offset > (uint)_lenght)
+        {
+            throw new IndexOutOfRangeException();
+        }
+        return new MySpan<T>(ref Unsafe.Add(ref _reference, offset), _lenght - offset);
+    }
 }
 
 
